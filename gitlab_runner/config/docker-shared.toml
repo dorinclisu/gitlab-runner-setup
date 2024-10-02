@@ -1,0 +1,5 @@
+[[runners]]
+  [runners.docker]
+    image = "docker:stable"
+    host = "unix:///var/run/docker.sock"
+    volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
