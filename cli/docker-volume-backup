@@ -1,0 +1,12 @@
+#!/bin/sh
+
+VOLUME_NAME=$1
+BACKUP_DIR=$2
+echo "Usage: $0 VOLUME_NAME BACKUP_DIR"
+
+set -e
+
+docker run --rm -v $VOLUME_NAME:/data -v $BACKUP_DIR:/backup alpine tar cvf /backup/$VOLUME_NAME.tar /data
+
+echo
+echo "Backup saved to $BACKUP_DIR/$VOLUME_NAME.tar"

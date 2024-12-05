@@ -1,0 +1,19 @@
+#!/bin/sh
+
+BACKUP_FILE=$1
+VOLUME_NAME=$2
+echo "Usage: $0 BACKUP_FILE VOLUME_NAME"
+
+BACKUP_FILE=`dirname $BACKUP_FILE`/`basename $BACKUP_FILE`
+if [ ! -f $BACKUP_FILE ]; then
+  echo "Backup file not found: $BACKUP_FILE"
+  exit 1
+fi
+
+docker volume inspect $VOLUME_NAME > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Volume not found: $VOLUME_NAME"
+  exit 1
+fi
+
+docker run --rm -v $VOLUME_NAME:/data -v $BACKUP_FILE:/backup/backup.tar alpine sh -c "cd /data && tar xvf /backup/backup.tar --strip 1"
