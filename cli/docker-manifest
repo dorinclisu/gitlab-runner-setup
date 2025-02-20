@@ -1,0 +1,24 @@
+#!/bin/sh
+IMAGE=$1
+TAG=$2
+MAPPING=$3
+echo "Usage: $0 IMAGE TAG tag1:arch1,tag2:arch2,..."
+echo "Create a multi-arch manifest on TAG from arch-specific tags."
+echo ""
+
+echo "$MAPPING" | tr ',' '\n' | while read element
+do
+    if ! echo "$element" | grep -q '^[^:]\+:[^:]\+$'; then
+        echo "ERROR: Invalid mapping element '$element'"
+        exit 1
+    fi
+
+    TAG_ARCH=$(echo "$element" | cut -d':' -f1)
+    ARCH=$(echo "$element" | cut -d':' -f2)
+
+    echo "Annotating manifest '$TAG_ARCH' with arch '$ARCH' ..."
+    docker manifest create $IMAGE:$TAG --amend $IMAGE:$TAG_ARCH
+    docker manifest annotate $IMAGE:$TAG $IMAGE:$TAG_ARCH --arch $ARCH
+done
+
+docker manifest push $IMAGE:$TAG
